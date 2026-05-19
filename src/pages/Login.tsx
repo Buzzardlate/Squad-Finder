@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ const Login = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  // Prevenção de Erros (Nielsen)
   const validate = () => {
     const e: Record<string, string> = {};
     if (!email.trim()) e.email = "E-mail é obrigatório";
@@ -28,7 +29,8 @@ const Login = () => {
     if (!validate()) return;
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    // Inversão de Dependência (DIP) - Chamando o serviço
+    const { error } = await authService.login(email, password);
 
     setLoading(false);
 
@@ -78,8 +80,9 @@ const Login = () => {
               {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {/* Lei de Fitts: Botão maior (py-6 text-lg) para facilitar o clique */}
+            <Button type="submit" className="w-full py-6 text-lg font-semibold" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
               Entrar
             </Button>
 

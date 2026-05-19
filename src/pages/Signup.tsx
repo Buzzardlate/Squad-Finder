@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,14 +35,8 @@ const Signup = () => {
     if (!validate()) return;
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name, profile_type: profileType },
-        emailRedirectTo: window.location.origin,
-      },
-    });
+    // Inversão de Dependência (DIP) - Chamando o serviço
+    const { error } = await authService.register(email, password, name, profileType);
 
     setLoading(false);
 
@@ -75,7 +69,6 @@ const Signup = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Profile type tabs */}
             <div className="flex rounded-lg bg-muted p-1 gap-1">
               {tabs.map((tab) => (
                 <button
@@ -132,8 +125,9 @@ const Signup = () => {
               {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {/* Lei de Fitts: Botão maior */}
+            <Button type="submit" className="w-full py-6 text-lg font-semibold" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
               Cadastrar
             </Button>
 
