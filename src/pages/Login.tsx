@@ -15,7 +15,6 @@ const Login = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  // Prevenção de Erros (Nielsen)
   const validate = () => {
     const e: Record<string, string> = {};
     if (!email.trim()) e.email = "E-mail é obrigatório";
@@ -29,7 +28,6 @@ const Login = () => {
     if (!validate()) return;
     setLoading(true);
 
-    // Inversão de Dependência (DIP) - Chamando o serviço
     const { error } = await authService.login(email, password);
 
     setLoading(false);
@@ -40,7 +38,7 @@ const Login = () => {
     }
 
     toast.success("Login realizado com sucesso!");
-    navigate("/");
+    navigate("/dashboard"); 
   };
 
   return (
